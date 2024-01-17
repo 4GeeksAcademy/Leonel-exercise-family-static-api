@@ -38,6 +38,57 @@ def handle_hello():
 
     return jsonify(response_body), 200
 
+
+@app.route("/member/<int:id>",methods=['GET'])
+def get_member(id):
+    try:
+        member_needed=jackson_family.get_member(id)
+        if member_needed:
+            return jsonify(member_needed),200
+        else:
+            return jsonify({"error","the member does not exist"}),404
+
+    except:
+        return jsonify({"error","there was an error in the server"}),500
+
+
+
+@app.route("/new_member",methods=['POST'])
+def post_new_member():
+    try:
+        first_name=request.json.get("first_name")
+        age=request.json.get("age")
+        lucky_numbers=request.json.get("lucky_numbers")
+        last_name=request.json.get("last_name")
+
+        new_member={
+            "first_name":first_name,
+            "age":age,
+            "lucky_numbers":lucky_numbers,
+            "last_name":"Jackson"
+        }
+
+        jackson_family.add_member(new_member)
+
+        return jsonify({"message":"Member added succesfully"}),200
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}),400
+
+
+@app.route("/delete_member/<int:id>",methods=["DELETE"])
+def delete_member(id):
+    try:
+        members_list_updated=jackson_family.delete_member(id)
+        if (members_list_updated):
+            return jsonify({"message":"the member does not exist!"}),404
+        else:
+            return jsonify({"message":"member deleted succesfully"}),200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+    
+
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))
